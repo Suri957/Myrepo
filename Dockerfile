@@ -1,3 +1,9 @@
-FROM mcr.microsoft.com/java/tomcat:8-zulu-alpine-tomcat-9
+FROM maven AS s1
+COPY ./src /usr/src/app/src
+COPY pom.xml /usr/src/app
+RUN mvn -f /usr/src/app/pom.xml clean install
+
+
+FROM tomcat
 RUN rm -fr /usr/local/tomcat/webapps/ROOT
-COPY target/testapp.war /usr/local/tomcat/webapps/ROOT.war
+COPY --from=s1 /usr/src/app/target/testapp1.war /usr/local/tomcat/webapps/ROOT.war
